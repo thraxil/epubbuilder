@@ -31,7 +31,7 @@ class TestAPI(TestCase):
 
         book.addTitlePage()
         book.addTocPage()
-        book.addCover(r'test_data/blank.png')
+        book.addCover(r'test_data/ccnmtl.gif')
 
         book.addCss(r'test_data/main.css', 'main.css')
 

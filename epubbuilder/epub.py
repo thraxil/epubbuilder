@@ -35,12 +35,12 @@ class TocMapNode:
 
 
 class EpubItem:
-    def __init__(self):
-        self.id = ''
-        self.srcPath = ''
-        self.destPath = ''
-        self.mimeType = ''
-        self.html = ''
+    def __init__(self, id='', srcPath='', destPath='', mimeType='', html=''):
+        self.id = id
+        self.srcPath = srcPath
+        self.destPath = destPath
+        self.mimeType = mimeType
+        self.html = html
 
 
 class EpubBook:
@@ -121,11 +121,13 @@ class EpubBook:
         return '\n'.join(["%s: %d" % (l,n) for (l,n) in s])
 
     def addImage(self, srcPath, destPath):
-        item = EpubItem()
-        item.id = 'image_%d' % (len(self.imageItems) + 1)
-        item.srcPath = srcPath
-        item.destPath = destPath
-        item.mimeType = mimetypes.guess_type(destPath)[0]
+        item = EpubItem(
+            id='image_%d' % (len(self.imageItems) + 1),
+            srcPath=srcPath,
+            destPath = destPath,
+            mimeType=mimetypes.guess_type(destPath)[0],
+            html=None,
+            )
         if item.destPath not in self.imageItems:
             self.imageItems[item.destPath] = item
         return self.imageItems[item.destPath]
@@ -139,33 +141,32 @@ class EpubBook:
         return self.addHtml('', '%s.html' % imageItem.destPath, html)
 
     def addHtml(self, srcPath, destPath, html=None):
-        item = EpubItem()
-        item.id = 'html_%d' % (len(self.htmlItems) + 1)
-        item.srcPath = srcPath
-        item.destPath = destPath
-        if html is not None:
-            item.html = html
-        item.mimeType = 'application/xhtml+xml'
+        item = EpubItem(
+            id='html_%d' % (len(self.htmlItems) + 1),
+            srcPath=srcPath,
+            destPath=destPath,
+            html=html,
+            mimeType='application/xhtml+xml')
         if item.destPath not in self.htmlItems:
             self.htmlItems[item.destPath] = item
         return self.htmlItems[item.destPath]
 
     def addCss(self, srcPath, destPath):
-        item = EpubItem()
-        item.id = 'css_%d' % (len(self.cssItems) + 1)
-        item.srcPath = srcPath
-        item.destPath = destPath
-        item.mimeType = 'text/css'
+        item = EpubItem(
+            id = 'css_%d' % (len(self.cssItems) + 1),
+            srcPath = srcPath,
+            destPath = destPath,
+            mimeType = 'text/css')
         if item.destPath not in self.cssItems:
             self.cssItems[item.destPath] = item
         return self.cssItems[item.destPath]
 
     def addScript(self, srcPath, destPath):
-        item = EpubItem()
-        item.id = 'js_%d' % (len(self.scriptItems) + 1)
-        item.srcPath = srcPath
-        item.destPath = destPath
-        item.mimeType = 'text/javascript'
+        item = EpubItem(
+            id='js_%d' % (len(self.scriptItems) + 1),
+            srcPath=srcPath,
+            destPath=destPath,
+            mimeType='text/javascript')
         if item.destPath not in self.scriptItems:
             self.scriptItems[item.destPath] = item
         return self.scriptItems[item.destPath]
