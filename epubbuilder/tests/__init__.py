@@ -53,6 +53,9 @@ class TestAPI(TestCase):
         book.addTocMapNode(n12.destPath, '1.2', 2)
         book.addTocMapNode(n2.destPath, '2')
 
+        expected = """HTML: 7\nCSS: 1\nJS: 0\nImages: 1"""
+        self.assertEquals(book.summary(), expected)
+
         rootDir = r'test_output/test0'
         book.createBook(rootDir)
         epub.EpubBook.createArchive(rootDir, rootDir + '.epub')

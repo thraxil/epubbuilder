@@ -107,17 +107,19 @@ class EpubBook:
         return sorted(self.scriptItems.values(), key=lambda x: x.id)
 
     def getAllItems(self):
-        print '   Items in ebook:'
-        print '     HTML:', len(self.htmlItems)
-        print '     CSS:', len(self.cssItems)
-        print '     JS:', len(self.scriptItems)
-        print '     Images:', len(self.imageItems)
         return sorted(
             itertools.chain(
                 self.imageItems.values(),
                 self.htmlItems.values(),
                 self.cssItems.values(),
                 self.scriptItems.values()), key=lambda x: x.id)
+
+    def summary(self):
+        s = [('HTML', len(self.htmlItems)),
+             ('CSS', len(self.cssItems)),
+             ('JS', len(self.scriptItems)),
+             ('Images', len(self.imageItems))]
+        return '\n'.join(["%s: %d" % (l,n) for (l,n) in s])
 
     def addImage(self, srcPath, destPath):
         item = EpubItem()
@@ -281,10 +283,8 @@ class EpubBook:
             maxval=len(items)
         ).start()
         for item in items:
-            #print item.id, item.destPath
             outname = os.path.join(self.rootDir, 'OEBPS', item.destPath)
             if item.html:
-                print '   writing html to %s' % (outname)
                 fout = open(outname, 'w')
                 fout.write(item.html)
                 fout.close()
