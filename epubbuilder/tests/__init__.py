@@ -1,6 +1,7 @@
 from epubbuilder import epub
 from unittest import TestCase
 import os.path
+import zipfile
 
 
 def getMinimalHtml(text):
@@ -15,45 +16,44 @@ def getMinimalHtml(text):
 
 class TestAPI(TestCase):
     def setUp(self):
-        pass
+        self.book = epub.EpubBook()
+        self.book.setTitle('Most Wanted Tips for Aspiring Young Pirates')
+        self.book.addCreator('Monkey D Luffy')
+        self.book.addCreator('Guybrush Threepwood')
+        self.book.addMeta('contributor', 'Smalltalk80', role='bkp')
+        self.book.addMeta('date', '2010', event='publication')
+
+        self.book.addTitlePage()
+        self.book.addTocPage()
+        self.book.addCover(r'test_data/ccnmtl.gif')
+
+        self.book.addCss(r'test_data/main.css', 'main.css')
+
+        n1 = self.book.addHtml('', '1.html', getMinimalHtml('Chapter 1'))
+        n11 = self.book.addHtml('', '2.html', getMinimalHtml('Section 1.1'))
+        n111 = self.book.addHtml('', '3.html',
+                                 getMinimalHtml('Subsection 1.1.1'))
+        n12 = self.book.addHtml('', '4.html', getMinimalHtml('Section 1.2'))
+        n2 = self.book.addHtml('', '5.html', getMinimalHtml('Chapter 2'))
+
+        self.book.addSpineItem(n1)
+        self.book.addSpineItem(n11)
+        self.book.addSpineItem(n111)
+        self.book.addSpineItem(n12)
+        self.book.addSpineItem(n2)
+
+        self.book.addTocMapNode(n1.destPath, '1')
+        self.book.addTocMapNode(n11.destPath, '1.1', 2)
+        self.book.addTocMapNode(n111.destPath, '1.1.1', 3)
+        self.book.addTocMapNode(n12.destPath, '1.2', 2)
+        self.book.addTocMapNode(n2.destPath, '2')
 
     def tearDown(self):
         pass
 
     def test_endtoend(self):
-        book = epub.EpubBook()
-        book.setTitle('Most Wanted Tips for Aspiring Young Pirates')
-        book.addCreator('Monkey D Luffy')
-        book.addCreator('Guybrush Threepwood')
-        book.addMeta('contributor', 'Smalltalk80', role='bkp')
-        book.addMeta('date', '2010', event='publication')
-
-        book.addTitlePage()
-        book.addTocPage()
-        book.addCover(r'test_data/ccnmtl.gif')
-
-        book.addCss(r'test_data/main.css', 'main.css')
-
-        n1 = book.addHtml('', '1.html', getMinimalHtml('Chapter 1'))
-        n11 = book.addHtml('', '2.html', getMinimalHtml('Section 1.1'))
-        n111 = book.addHtml('', '3.html', getMinimalHtml('Subsection 1.1.1'))
-        n12 = book.addHtml('', '4.html', getMinimalHtml('Section 1.2'))
-        n2 = book.addHtml('', '5.html', getMinimalHtml('Chapter 2'))
-
-        book.addSpineItem(n1)
-        book.addSpineItem(n11)
-        book.addSpineItem(n111)
-        book.addSpineItem(n12)
-        book.addSpineItem(n2)
-
-        book.addTocMapNode(n1.destPath, '1')
-        book.addTocMapNode(n11.destPath, '1.1', 2)
-        book.addTocMapNode(n111.destPath, '1.1.1', 3)
-        book.addTocMapNode(n12.destPath, '1.2', 2)
-        book.addTocMapNode(n2.destPath, '2')
-
         expected = """HTML: 7\nCSS: 1\nJS: 0\nImages: 1"""
-        self.assertEqual(book.summary(), expected)
+        self.assertEqual(self.book.summary(), expected)
 
         expected = (
             """<?xml version="1.0" encoding="UTF-8" """
@@ -62,14 +62,20 @@ class TestAPI(TestCase):
             """version="1.0">\n  <rootfiles>\n    <rootfile """
             """full-path="OEBPS/content.opf" media-type="application/"""
             """oebps-package+xml"/>\n  </rootfiles>\n</container>""")
-        self.assertEqual(book.container_xml(), expected)
+        self.assertEqual(self.book.container_xml(), expected)
 
-        self.assertIn("<navMap", book.toc_nox())
+        self.assertIn("<navMap", self.book.toc_ncx())
 
-        self.assertIn("<opf:item", book.content_opf())
+        self.assertIn("<opf:item", self.book.content_opf())
 
         rootDir = r'test_output/test0'
-        book.createBook(rootDir)
+        self.book.createBook(rootDir)
         epub.EpubBook.createArchive(rootDir, rootDir + '.epub')
         self.assertTrue(os.path.exists(rootDir))
         self.assertTrue(os.path.exists(rootDir + '.epub'))
+
+    def test_in_memory(self):
+        out = self.book.make_epub()
+        # try parsing it as a zipfile
+        z = zipfile.ZipFile(out, "r")
+        assert 'mimetype' in z.namelist()

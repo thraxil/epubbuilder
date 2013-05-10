@@ -13,6 +13,7 @@ import uuid
 import zipfile
 from genshi.template import TemplateLoader
 from lxml import etree
+from cStringIO import StringIO
 
 
 class TocMapNode:
@@ -262,14 +263,14 @@ class EpubBook:
         fout.write(self.container_xml())
         fout.close()
 
-    def toc_nox(self):
+    def toc_ncx(self):
         tmpl = self.loader.load('toc.ncx')
         return tmpl.generate(book=self).render('xml')
 
     def __writeTocNCX(self):
         self.tocMapRoot.assignPlayOrder()
         fout = open(os.path.join(self.rootDir, 'OEBPS', 'toc.ncx'), 'w')
-        fout.write(self.toc_nox())
+        fout.write(self.toc_ncx())
         fout.close()
 
     def content_opf(self):
@@ -336,3 +337,32 @@ class EpubBook:
         self.__writeContainerXML()
         self.__writeContentOPF()
         self.__writeTocNCX()
+
+    def make_epub(self):
+        """ make the epub file as a zip in memory
+        and return the file object """
+        sio = StringIO()
+        z = zipfile.ZipFile(sio, 'w', zipfile.ZIP_DEFLATED)
+        z.writestr('mimetype', 'application/epub+zip',
+                   compress_type=zipfile.ZIP_STORED)
+
+        items = self.getAllItems()
+        for item in items:
+            outname = os.path.join('OEBPS', item.destPath)
+            if item.html:
+                z.writestr(outname, item.html)
+            else:
+                # This still relies on local filesystem access
+                # need to support in-memory file objects
+                # on individual items
+                try:
+                    z.write(item.srcPath, outname)
+                except OSError:
+                    # can't find it...
+                    pass
+
+        z.writestr('META-INF/container.xml', self.container_xml())
+        z.writestr('OEBPS/content.opf', self.content_opf())
+        z.writestr('OEBPS/toc.ncx', self.toc_ncx())
+        z.close()
+        return sio
