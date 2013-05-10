@@ -22,7 +22,6 @@ class TestAPI(TestCase):
 
     def test_endtoend(self):
         book = epub.EpubBook()
-        book.setTitle("test title")
         book.setTitle('Most Wanted Tips for Aspiring Young Pirates')
         book.addCreator('Monkey D Luffy')
         book.addCreator('Guybrush Threepwood')
@@ -54,7 +53,20 @@ class TestAPI(TestCase):
         book.addTocMapNode(n2.destPath, '2')
 
         expected = """HTML: 7\nCSS: 1\nJS: 0\nImages: 1"""
-        self.assertEquals(book.summary(), expected)
+        self.assertEqual(book.summary(), expected)
+
+        expected = (
+            """<?xml version="1.0" encoding="UTF-8" """
+            """standalone="no"?>\n<container xmlns="urn:"""
+            """oasis:names:tc:opendocument:xmlns:container" """
+            """version="1.0">\n  <rootfiles>\n    <rootfile """
+            """full-path="OEBPS/content.opf" media-type="application/"""
+            """oebps-package+xml"/>\n  </rootfiles>\n</container>""")
+        self.assertEqual(book.container_xml(), expected)
+
+        self.assertIn("<navMap", book.toc_nox())
+
+        self.assertIn("<opf:item", book.content_opf())
 
         rootDir = r'test_output/test0'
         book.createBook(rootDir)

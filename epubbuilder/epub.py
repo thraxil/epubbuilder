@@ -35,7 +35,7 @@ class TocMapNode:
 
 
 class EpubItem:
-    def __init__(self, id='', srcPath='', destPath='', mimeType='', html=''):
+    def __init__(self, id='', srcPath='', destPath='', mimeType='', html=None):
         self.id = id
         self.srcPath = srcPath
         self.destPath = destPath
@@ -252,27 +252,33 @@ class EpubBook:
         except OSError:
             pass
 
+    def container_xml(self):
+        tmpl = self.loader.load('container.xml')
+        return tmpl.generate().render('xml')
+
     def __writeContainerXML(self):
         fout = open(
             os.path.join(self.rootDir, 'META-INF', 'container.xml'), 'w')
-        tmpl = self.loader.load('container.xml')
-        stream = tmpl.generate()
-        fout.write(stream.render('xml'))
+        fout.write(self.container_xml())
         fout.close()
+
+    def toc_nox(self):
+        tmpl = self.loader.load('toc.ncx')
+        return tmpl.generate(book=self).render('xml')
 
     def __writeTocNCX(self):
         self.tocMapRoot.assignPlayOrder()
         fout = open(os.path.join(self.rootDir, 'OEBPS', 'toc.ncx'), 'w')
-        tmpl = self.loader.load('toc.ncx')
-        stream = tmpl.generate(book=self)
-        fout.write(stream.render('xml'))
+        fout.write(self.toc_nox())
         fout.close()
+
+    def content_opf(self):
+        tmpl = self.loader.load('content.opf')
+        return tmpl.generate(book=self).render('xml')
 
     def __writeContentOPF(self):
         fout = open(os.path.join(self.rootDir, 'OEBPS', 'content.opf'), 'w')
-        tmpl = self.loader.load('content.opf')
-        stream = tmpl.generate(book=self)
-        fout.write(stream.render('xml'))
+        fout.write(self.content_opf())
         fout.close()
 
     def __writeItems(self):
