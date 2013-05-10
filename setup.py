@@ -10,7 +10,7 @@ setup(
     description="epub builder library",
     long_description="forked from python-epub-builder",
     install_requires = [
-        "lxml", "genshi", "progressbar", "nose"
+        "lxml", "genshi", "nose"
         ],
     scripts = [],
     license = "BSD",

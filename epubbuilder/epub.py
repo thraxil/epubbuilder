@@ -11,7 +11,6 @@ import shutil
 import subprocess
 import uuid
 import zipfile
-import progressbar
 from genshi.template import TemplateLoader
 from lxml import etree
 
@@ -277,11 +276,6 @@ class EpubBook:
 
     def __writeItems(self):
         items = self.getAllItems()
-        pbar = progressbar.ProgressBar(
-            widgets=[progressbar.Percentage(), progressbar.Counter('%5d'),
-                     progressbar.Bar(), progressbar.ETA()],
-            maxval=len(items)
-        ).start()
         for item in items:
             outname = os.path.join(self.rootDir, 'OEBPS', item.destPath)
             if item.html:
@@ -290,8 +284,6 @@ class EpubBook:
                 fout.close()
             else:
                 shutil.copyfile(item.srcPath, outname)
-                pbar.update(pbar.currval + 1)
-        pbar.finish()
 
     def __writeMimeType(self):
         fout = open(os.path.join(self.rootDir, 'mimetype'), 'w')
