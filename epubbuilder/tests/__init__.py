@@ -5,7 +5,7 @@ import os.path
 
 def getMinimalHtml(text):
     return ("""<!DOCTYPE html PUBLIC "-//W3C//DTD XHtml 1.1//EN" """
-                """"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+            """"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head><title>%s</title></head>
 <body><p>%s</p></body>

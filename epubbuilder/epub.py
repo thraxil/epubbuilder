@@ -118,16 +118,16 @@ class EpubBook:
              ('CSS', len(self.cssItems)),
              ('JS', len(self.scriptItems)),
              ('Images', len(self.imageItems))]
-        return '\n'.join(["%s: %d" % (l,n) for (l,n) in s])
+        return '\n'.join(["%s: %d" % (l, n) for (l, n) in s])
 
     def addImage(self, srcPath, destPath):
         item = EpubItem(
             id='image_%d' % (len(self.imageItems) + 1),
             srcPath=srcPath,
-            destPath = destPath,
+            destPath=destPath,
             mimeType=mimetypes.guess_type(destPath)[0],
             html=None,
-            )
+        )
         if item.destPath not in self.imageItems:
             self.imageItems[item.destPath] = item
         return self.imageItems[item.destPath]
@@ -153,10 +153,10 @@ class EpubBook:
 
     def addCss(self, srcPath, destPath):
         item = EpubItem(
-            id = 'css_%d' % (len(self.cssItems) + 1),
-            srcPath = srcPath,
-            destPath = destPath,
-            mimeType = 'text/css')
+            id='css_%d' % (len(self.cssItems) + 1),
+            srcPath=srcPath,
+            destPath=destPath,
+            mimeType='text/css')
         if item.destPath not in self.cssItems:
             self.cssItems[item.destPath] = item
         return self.cssItems[item.destPath]
