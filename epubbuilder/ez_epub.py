@@ -7,7 +7,6 @@ from genshi.template import TemplateLoader
 
 
 class Section:
-
     def __init__(self):
         self.title = ''
         self.subsections = []
