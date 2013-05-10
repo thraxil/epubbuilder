@@ -40,7 +40,7 @@ class Book:
             for i, subsection in enumerate(section.subsections):
                 self.__addSection(subsection, id + str(i + 1), depth + 1)
 
-    def make(self, outputDir):
+    def make(self, outputDir, validate=False):
         outputFile = outputDir + '.epub'
         self.impl.setTitle(self.title)
         self.impl.setLang(self.lang)
@@ -55,4 +55,5 @@ class Book:
         self.__addSection(root, 's', 0)
         self.impl.createBook(outputDir)
         self.impl.createArchive(outputDir, outputFile)
-        self.impl.checkEpub('epubcheck-1.0.5.jar', outputFile)
+        if validate:
+            self.impl.checkEpub('epubcheck-1.0.5.jar', outputFile)
