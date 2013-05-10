@@ -16,14 +16,14 @@ class Section:
 
 
 class Book:
-    def __init__(self):
+    def __init__(self, template_dir="templates"):
         self.impl = epub.EpubBook()
         self.title = ''
         self.authors = []
         self.cover = ''
         self.lang = 'en-US'
         self.sections = []
-        self.templateLoader = TemplateLoader('templates')
+        self.templateLoader = TemplateLoader(template_dir)
 
     def __addSection(self, section, id, depth):
         if depth > 0:

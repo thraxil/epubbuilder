@@ -44,8 +44,8 @@ class EpubItem:
 
 
 class EpubBook:
-    def __init__(self):
-        self.loader = TemplateLoader('templates')
+    def __init__(self, template_dir="templates"):
+        self.loader = TemplateLoader(template_dir)
 
         self.rootDir = ''
         self.UUID = uuid.uuid1()
