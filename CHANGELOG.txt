@@ -1,3 +1,9 @@
+## 0.1.2 - 2013-05-17
+
+* make sure the playOrder stuff gets generated and titlepage/toc is
+  always generated.
+  - Anders Pearson <anders@columbia.edu>
+
 ## 0.1.1 - 2013-05-17
 
 * epubs can now be created entirely in memory without requiring a

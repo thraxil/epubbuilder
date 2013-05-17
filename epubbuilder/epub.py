@@ -348,6 +348,10 @@ class EpubBook:
     def make_epub(self):
         """ make the epub file as a zip in memory
         and return the file object """
+        if self.titlePage:
+            self.__makeTitlePage()
+        if self.tocPage:
+            self.__makeTocPage()
         sio = StringIO()
         z = zipfile.ZipFile(sio, 'w', zipfile.ZIP_DEFLATED)
         z.writestr('mimetype', 'application/epub+zip',
@@ -373,6 +377,7 @@ class EpubBook:
 
         z.writestr('META-INF/container.xml', self.container_xml())
         z.writestr('OEBPS/content.opf', self.content_opf())
+        self.tocMapRoot.assignPlayOrder()
         z.writestr('OEBPS/toc.ncx', self.toc_ncx())
         z.close()
         return sio
