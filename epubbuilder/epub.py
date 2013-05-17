@@ -36,12 +36,14 @@ class TocMapNode:
 
 
 class EpubItem:
-    def __init__(self, id='', srcPath='', destPath='', mimeType='', html=None):
+    def __init__(self, id='', srcPath='', destPath='', mimeType='', html=None,
+                 fileobj=None):
         self.id = id
         self.srcPath = srcPath
         self.destPath = destPath
         self.mimeType = mimeType
         self.html = html
+        self.fileobj = fileobj
 
 
 class EpubBook:
@@ -121,13 +123,14 @@ class EpubBook:
              ('Images', len(self.imageItems))]
         return '\n'.join(["%s: %d" % (l, n) for (l, n) in s])
 
-    def addImage(self, srcPath, destPath):
+    def addImage(self, srcPath, destPath, fileobj=None):
         item = EpubItem(
             id='image_%d' % (len(self.imageItems) + 1),
             srcPath=srcPath,
             destPath=destPath,
             mimeType=mimetypes.guess_type(destPath)[0],
             html=None,
+            fileobj=fileobj,
         )
         if item.destPath not in self.imageItems:
             self.imageItems[item.destPath] = item
@@ -141,42 +144,46 @@ class EpubBook:
                              drop_xml_decl=False)
         return self.addHtml('', '%s.html' % imageItem.destPath, html)
 
-    def addHtml(self, srcPath, destPath, html=None):
+    def addHtml(self, srcPath, destPath, html=None, fileobj=None):
         item = EpubItem(
             id='html_%d' % (len(self.htmlItems) + 1),
             srcPath=srcPath,
             destPath=destPath,
             html=html,
+            fileobj=fileobj,
             mimeType='application/xhtml+xml')
         if item.destPath not in self.htmlItems:
             self.htmlItems[item.destPath] = item
         return self.htmlItems[item.destPath]
 
-    def addCss(self, srcPath, destPath):
+    def addCss(self, srcPath="", destPath="", fileobj=None):
         item = EpubItem(
             id='css_%d' % (len(self.cssItems) + 1),
             srcPath=srcPath,
             destPath=destPath,
+            fileobj=fileobj,
             mimeType='text/css')
         if item.destPath not in self.cssItems:
             self.cssItems[item.destPath] = item
         return self.cssItems[item.destPath]
 
-    def addScript(self, srcPath, destPath):
+    def addScript(self, srcPath, destPath, fileobj=None):
         item = EpubItem(
             id='js_%d' % (len(self.scriptItems) + 1),
             srcPath=srcPath,
             destPath=destPath,
+            fileobj=fileobj,
             mimeType='text/javascript')
         if item.destPath not in self.scriptItems:
             self.scriptItems[item.destPath] = item
         return self.scriptItems[item.destPath]
 
-    def addCover(self, srcPath):
+    def addCover(self, srcPath="", fileobj=None, ext=".jpg"):
         assert not self.coverImage
-        _, ext = os.path.splitext(srcPath)
+        if srcPath:
+            _, ext = os.path.splitext(srcPath)
         destPath = 'cover%s' % ext
-        self.coverImage = self.addImage(srcPath, destPath)
+        self.coverImage = self.addImage(srcPath, destPath, fileobj=fileobj)
 
     def __makeTitlePage(self):
         assert self.titlePage
@@ -352,14 +359,17 @@ class EpubBook:
             if item.html:
                 z.writestr(outname, item.html)
             else:
-                # This still relies on local filesystem access
-                # need to support in-memory file objects
-                # on individual items
-                try:
-                    z.write(item.srcPath, outname)
-                except OSError:
-                    # can't find it...
-                    pass
+                if item.fileobj:
+                    z.writestr(outname, item.fileobj.read())
+                else:
+                    # This still relies on local filesystem access
+                    # need to support in-memory file objects
+                    # on individual items
+                    try:
+                        z.write(item.srcPath, outname)
+                    except OSError:
+                        # can't find it...
+                        pass
 
         z.writestr('META-INF/container.xml', self.container_xml())
         z.writestr('OEBPS/content.opf', self.content_opf())

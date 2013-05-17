@@ -1,0 +1,14 @@
+## 0.1.1 - 2013-05-17
+
+* epubs can now be created entirely in memory without requiring a
+  directory of source material to exist or an intermediate output
+  directory. It can even generate the zip as an in-memory zipfile
+  so that doesn't have to be written to disk either.
+  This is the basic requirement for using this from inside a
+  web app where we don't want to have to deal with the fileystem.
+  - Anders Pearson <anders@columbia.edu>
+
+## 0.1.0 - 2013-05-10
+
+* initial fork and clean up
+  - Anders Pearson <anders@columbia.edu>
