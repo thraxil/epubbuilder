@@ -3,7 +3,7 @@ from multiprocessing import util
 
 setup(
     name="epubbuilder",
-    version="0.1.3",
+    version="0.1.4",
     author="Anders Pearson",
     author_email="anders@columbia.edu",
     url="",

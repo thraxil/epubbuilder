@@ -379,6 +379,7 @@ class EpubBook:
         z.writestr('META-INF/container.xml', self.container_xml())
         z.writestr('OEBPS/content.opf', self.content_opf())
         self.tocMapRoot.assignPlayOrder()
-        z.writestr('OEBPS/toc.ncx', self.toc_ncx())
+        z.writestr('OEBPS/toc.ncx',
+                   self.toc_ncx().encode('ascii', 'xmlcharrefreplace'))
         z.close()
         return sio
