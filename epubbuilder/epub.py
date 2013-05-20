@@ -361,7 +361,8 @@ class EpubBook:
         for item in items:
             outname = os.path.join('OEBPS', item.destPath)
             if item.html:
-                z.writestr(outname, item.html)
+                z.writestr(outname,
+                           item.html.encode('ascii', 'xmlcharrefreplace'))
             else:
                 if item.fileobj:
                     z.writestr(outname, item.fileobj.read())

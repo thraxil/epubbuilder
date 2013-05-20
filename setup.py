@@ -3,14 +3,14 @@ from multiprocessing import util
 
 setup(
     name="epubbuilder",
-    version="0.1.2",
+    version="0.1.3",
     author="Anders Pearson",
     author_email="anders@columbia.edu",
     url="",
     description="epub builder library",
     long_description="forked from python-epub-builder",
     install_requires = [
-        "lxml", "genshi", "nose"
+        "lxml", "Genshi", "nose"
         ],
     scripts = [],
     license = "BSD",
